@@ -1,0 +1,24 @@
+--Creacion del trigger--
+CREATE or replace function ser_embal ()
+returns trigger as $ser_embal$
+declare 
+hora int;
+begin 
+select momento_difunto into hora from difunto;
+if ( hora < 48) then 
+raise exception 'No se puede realizar el embalsamiento';
+end if;
+return new ;
+end;
+$ser_embal$
+language plpgsql;
+
+
+create trigger tiempoembal before insert  or update
+on difunto for each row 
+execute procedure ser_embal();
+
+
+--Insertar dato a la tabla difunto--
+
+insert into  DIFUNTO values('430', '630', 'ROSA JUANA ', 'DELGADO Z', 'MUJER', '1970/09/25', '2021/09/15', '15:00', '2021/09/17', '16:00','60');
