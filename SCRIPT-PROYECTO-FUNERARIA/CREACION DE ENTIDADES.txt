@@ -1,0 +1,182 @@
+/*==============================================================*/
+/* Table: CADENA_FUNERARIA                                      */
+/*==============================================================*/
+create table CADENA_FUNERARIA (
+   ID_CADENA            SERIAL not null,
+   NOMBRE_CADENA        TEXT not null,
+   constraint PK_CADENA_FUNERARIA primary key (ID_CADENA)
+);
+
+/*==============================================================*/
+/* Table: CAUSA                                                 */
+/*==============================================================*/
+create table CAUSA (
+   ID_CAUSA             SERIAL not null,
+   ID_DIFUNTO           INT4 not null,
+   DESCRIPCION_CAUSA    TEXT not null,
+   constraint PK_CAUSA primary key (ID_CAUSA)
+);
+
+/*==============================================================*/
+/* Table: DIFUNTO                                               */
+/*==============================================================*/
+create table DIFUNTO (
+   ID_DIFUNTO           SERIAL not null,
+   ID_FAMLIAR           INT4  not null,
+   NOMBRE_DIFUNTO       TEXT not null,
+   APELLIDO_DIFUNTO     TEXT not null,
+   GENERO_DIFUNTO       TEXT not null,
+   FECHANACIMIENTO_DIFUNTO DATE not null,
+   DIADEFUNSION_DIFUNTO DATE not null,
+   HORADEFUNSION_DIFUNTO TIME not null,
+   DIAEMBALSAMIENTO_DIFUNTO DATE not null,
+   HORAEMBALSAMIENTO_DIFUNTO TIME not null,
+   MOMENTO_DIFUNTO      integer not null,
+   constraint PK_DIFUNTO primary key (ID_DIFUNTO)
+);
+
+/*==============================================================*/
+/* Table: EMPLEADO                                              */
+/*==============================================================*/
+create table EMPLEADO (
+   ID_EMPLEADO          SERIAL not null,
+   ID_CADENA            INT4 not null,
+   ID_TIPOEMPLEADO      INT4 not null,
+   NOMBRE_EMPLEADO      TEXT not null,
+   APELLIDO_EMPLEADO    TEXT not null,
+   CEDULA_EMPLEADO      CHAR(10)not null,
+   DIRECCION_EMPLEADO   TEXT not null,
+   FECHANACIMIENTO_EMPLEADO DATE not null,
+   FECHAINGRESO_EMPLEADO DATE not null,
+   constraint PK_EMPLEADO primary key (ID_EMPLEADO)
+);
+
+/*==============================================================*/
+/* Table: FAMILIAR                                              */
+/*==============================================================*/
+create table FAMILIAR (
+   ID_FAMLIAR           SERIAL not null,
+   NOMBRE_FAMILIAR      TEXT not null,
+   APELLIDO_FAMILIAR    TEXT not null,
+   CEDULA_FAMILIAR      CHAR(10)not null,
+   constraint PK_FAMILIAR primary key (ID_FAMLIAR)
+);
+
+/*==============================================================*/
+/* Table: PROFESIONAL                                           */
+/*==============================================================*/
+create table PROFESIONAL (
+   ID_PROFESIONAL       SERIAL not null,
+   ID_CADENA            INT4 not null,
+   ID_TIPOPROFESIONAL   INT4 not null,
+   NOMBRE_PROFESIONAL   TEXT not null,
+   APELLIDO_PROFESIONAL TEXT not null,
+   CEDULA_PROFESIONAL   CHAR(10)not null,
+   FECHANACIMIENTO_PROFESIONAL DATE not null,
+   constraint PK_PROFESIONAL primary key (ID_PROFESIONAL)
+);
+
+/*==============================================================*/
+/* Table: SALA_VELATORIO                                        */
+/*==============================================================*/
+create table SALA_VELATORIO (
+   ID_ESPACIO           SERIAL not null,
+   ID_CADENA            INT4 not null,
+   ID_DIFUNTO           INT4 not null,
+   ID_EMPLEADO          INT4 not null,
+   NOMBRE_ESPACIO       TEXT not null,
+   DIMESIONES_ESPACIO   TEXT not null,
+   DIRECCION_ESPACIO    TEXT not null,
+   CAPACIDAD_ESPACIO    CHAR(10) not null,
+   HORARIORESERVA_ESPACIO DATE not null,
+   OBSERVACIONES_ESPACIO TEXT not null,
+   PRECIO_ESPACIO       DECIMAL not null,
+   constraint PK_SALA_VELATORIO primary key (ID_ESPACIO)
+);
+
+/*==============================================================*/
+/* Table: SERVICIO                                              */
+/*==============================================================*/
+create table SERVICIO (
+   ID_SERVICIO          SERIAL not null,
+   DESCRIPCION_SERVICIO TEXT not null,
+   ID_ESPACIO           INT4,
+   ID_FAMLIAR           INT4,
+   COSTO_SERVICIO       DECIMAL,
+   constraint PK_SERVICIO primary key (ID_SERVICIO)
+);
+
+/*==============================================================*/
+/* Table: TIPO_EMPLEADO                                         */
+/*==============================================================*/
+create table TIPO_EMPLEADO (
+   ID_TIPOEMPLEADO      SERIAL not null,
+   DESCRIPCION_TIPOEMPLEADO TEXT not null,
+   constraint PK_TIPO_EMPLEADO primary key (ID_TIPOEMPLEADO)
+);
+
+/*==============================================================*/
+/* Table: TIPO_PROFESIONAL                                      */
+/*==============================================================*/
+create table TIPO_PROFESIONAL (
+   ID_TIPOPROFESIONAL   SERIAL not null,
+   DESCRIPCION_PROFESIONAL TEXT not null,
+   constraint PK_TIPO_PROFESIONAL primary key (ID_TIPOPROFESIONAL)
+);
+
+
+alter table CAUSA
+   add constraint FK_CAUSA_TIENE12_DIFUNTO foreign key (ID_DIFUNTO)
+      references DIFUNTO (ID_DIFUNTO)
+      on delete restrict on update restrict;
+
+alter table DIFUNTO
+   add constraint FK_DIFUNTO_POSEE_FAMILIAR foreign key (ID_FAMLIAR)
+      references FAMILIAR (ID_FAMLIAR)
+      on delete restrict on update restrict;
+
+alter table EMPLEADO
+   add constraint FK_EMPLEADO_CONTIENE_TIPO_EMP foreign key (ID_TIPOEMPLEADO)
+      references TIPO_EMPLEADO (ID_TIPOEMPLEADO)
+      on delete restrict on update restrict;
+
+alter table EMPLEADO
+   add constraint FK_EMPLEADO_ESTIMA_CADENA_F foreign key (ID_CADENA)
+      references CADENA_FUNERARIA (ID_CADENA)
+      on delete restrict on update restrict;
+
+alter table PROFESIONAL
+   add constraint FK_PROFESIO_ALMACENA_TIPO_PRO foreign key (ID_TIPOPROFESIONAL)
+      references TIPO_PROFESIONAL (ID_TIPOPROFESIONAL)
+      on delete restrict on update restrict;
+
+alter table PROFESIONAL
+   add constraint FK_PROFESIO_CONSERVA_CADENA_F foreign key (ID_CADENA)
+      references CADENA_FUNERARIA (ID_CADENA)
+      on delete restrict on update restrict;
+
+alter table SALA_VELATORIO
+   add constraint FK_SALA_VEL_ADMINISTR_EMPLEADO foreign key (ID_EMPLEADO)
+      references EMPLEADO (ID_EMPLEADO)
+      on delete restrict on update restrict;
+
+alter table SALA_VELATORIO
+   add constraint FK_SALA_VEL_ALMACENA2_DIFUNTO foreign key (ID_DIFUNTO)
+      references DIFUNTO (ID_DIFUNTO)
+      on delete restrict on update restrict;
+
+alter table SALA_VELATORIO
+   add constraint FK_SALA_VEL_MANEJA_CADENA_F foreign key (ID_CADENA)
+      references CADENA_FUNERARIA (ID_CADENA)
+      on delete restrict on update restrict;
+
+alter table SERVICIO
+   add constraint FK_SERVICIO_ADQUIERE_FAMILIAR foreign key (ID_FAMLIAR)
+      references FAMILIAR (ID_FAMLIAR)
+      on delete restrict on update restrict;
+
+alter table SERVICIO
+   add constraint FK_SERVICIO_POSEEN_SALA_VEL foreign key (ID_ESPACIO)
+      references SALA_VELATORIO (ID_ESPACIO)
+      on delete restrict on update restrict;
+
