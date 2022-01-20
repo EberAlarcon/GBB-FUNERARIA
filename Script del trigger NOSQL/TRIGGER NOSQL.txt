@@ -1,0 +1,21 @@
+
+exports = async function(triggermongodb) {
+  const difunto= context.services.get("funeraria").db("mongodb").collection("difunto");
+  const hora_defunsion, fecha_defunsion, hora_embalsamiento, fecha_embalsamiento;
+  try {
+   await difunto
+    .insertOne(
+      { _id: changeEvent.documentKey._id },
+      { 
+        $currentDate: {
+        lastupdated: true
+        }
+      }
+    );
+    if (((fecha_defunsion*2)+ hora_defunsion) < (fecha_embalsamiento+hora_defunsion))
+    console.log("Registro guardado");
+  } catch (err) {
+       console.error("No se puede realizar el embalsamiento", err);
+  }
+  return; 
+};
